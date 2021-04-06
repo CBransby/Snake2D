@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CodeMonkey;
 using CodeMonkey.Utils;
+using System;
 
 public class Snake : MonoBehaviour {
 
@@ -26,9 +27,8 @@ public class Snake : MonoBehaviour {
     
     public LevelGrid levelGrid; //Variable for storing a Reference to the LevelGrid script.
     [SerializeField] private int snakeBodySize; //Variable for storing the current size of the snake
-    private List<Vector2Int> snakeMovePositionList; //A list of Vector2int to record the snakes movement.
-
-
+    private List<Vector2Int> snakeMovePositionList; //A list of Vector2int to record the snake's past movement.
+    private List<SnakeBodyPart> snakeBodyPartList; //A list of Transforms to record the snakes location 
 
     //Function to Setup a Reference to LevelGrid.cs on Spawn.
     //Called from GameHandler
@@ -44,6 +44,7 @@ public class Snake : MonoBehaviour {
         gridMoveDirection = new Vector2Int(1, 0);
 
         snakeMovePositionList = new List<Vector2Int>();//Initialise new list
+        snakeBodyPartList = new List<SnakeBodyPart>();//Initialise new list
     }
 
     private void Update() {
@@ -92,6 +93,7 @@ public class Snake : MonoBehaviour {
                 if (snakeAteFood) //If TrySnakeEatFood = true
                 { //then Grow Snake.
                     snakeBodySize++;
+                    CreateSnakeBody();
                 }
             }
 
@@ -100,20 +102,41 @@ public class Snake : MonoBehaviour {
                 snakeMovePositionList.RemoveAt(snakeMovePositionList.Count - 1);
             }
 
-            //TESTING############ Snake body by adding white square using code monkey utils
+
+
+            /*/TESTING############ Snake body by adding white square using code monkey utils
             for(int i=0; i<snakeMovePositionList.Count; i++)
             {
                 Vector2Int snakeMovePosition = snakeMovePositionList[i];
                 World_Sprite worldSprite = World_Sprite.Create(new Vector3(snakeMovePosition.x, snakeMovePosition.y, 0), Vector3.one * .5f, Color.white);
                 FunctionTimer.Create(worldSprite.DestroySelf, gridMoveTimerMax);
-            }
+            }*/
 
+            //Update Snake Head Location and Rotation. 
             transform.position = new Vector3(gridPosition.x, gridPosition.y);
             transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(gridMoveDirection) - 90);
+
+            UpdateSnakeBodyParts();
+            
 
             
         }
     }
+
+    private void UpdateSnakeBodyParts()
+    {
+        //Update Snake Body Parts Location
+        for (int i = 0; i < snakeBodyPartList.Count; i++)
+        {
+            snakeBodyPartList[i].SetGridPosition(snakeMovePositionList[i]);
+        }
+    }
+
+    private void CreateSnakeBody()
+    {
+        snakeBodyPartList.Add(new SnakeBodyPart(snakeBodyPartList.Count));
+    }
+
 
     private float GetAngleFromVector(Vector2Int dir) {
         float n = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
@@ -137,5 +160,26 @@ public class Snake : MonoBehaviour {
         List<Vector2Int> gridPositionList = new List<Vector2Int>() { gridPosition };
         gridPositionList.AddRange(snakeMovePositionList);
         return gridPositionList;
+    }
+
+    //I Think this should be in another script
+    //A class for SnakeBodyParts
+    private class SnakeBodyPart
+    {
+        private Transform transform;
+        private Vector2Int gridPosition;
+        public SnakeBodyPart(int bodyIndex)
+        {
+            GameObject snakeBodyObject = new GameObject("SnakeBody", typeof(SpriteRenderer));
+            snakeBodyObject.GetComponent<SpriteRenderer>().sprite = GameAssets.i.snakeBodySprite;
+            snakeBodyObject.GetComponent<SpriteRenderer>().sortingOrder = -bodyIndex;
+            transform = snakeBodyObject.transform;
+        }
+
+        public void SetGridPosition(Vector2Int gridPosition)
+        {
+            this.gridPosition = gridPosition;
+            transform.position = new Vector3(gridPosition.x, gridPosition.y, 0);
+        }
     }
 }
