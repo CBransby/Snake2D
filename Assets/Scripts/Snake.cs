@@ -13,6 +13,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CodeMonkey;
 using CodeMonkey.Utils;
 
 public class Snake : MonoBehaviour {
@@ -22,8 +23,10 @@ public class Snake : MonoBehaviour {
     private float gridMoveTimer;
     private float gridMoveTimerMax;
 
-    //Variable for storing a Reference to the LevelGrid script.
-    public LevelGrid levelGrid;
+    
+    public LevelGrid levelGrid; //Variable for storing a Reference to the LevelGrid script.
+    [SerializeField] private int snakeBodySize; //Variable for storing the current size of the snake
+    private List<Vector2Int> snakeMovePositionList; //A list of Vector2int to record the snakes movement.
 
 
 
@@ -39,6 +42,8 @@ public class Snake : MonoBehaviour {
         gridMoveTimerMax = .25f;
         gridMoveTimer = gridMoveTimerMax;
         gridMoveDirection = new Vector2Int(1, 0);
+
+        snakeMovePositionList = new List<Vector2Int>();//Initialise new list
     }
 
     private void Update() {
@@ -77,13 +82,36 @@ public class Snake : MonoBehaviour {
         gridMoveTimer += Time.deltaTime;
         if (gridMoveTimer >= gridMoveTimerMax) {
             gridMoveTimer -= gridMoveTimerMax;
-            gridPosition += gridMoveDirection;
+
+            snakeMovePositionList.Insert(0, gridPosition); //Insert new position into snakeMovePositionList.
+            
+            gridPosition += gridMoveDirection; //Set Snake's new position.
+
+            bool snakeAteFood = levelGrid.TrySnakeEatFood(gridPosition); //Call TrySnakeEatFood Function from LevelGrid.cs and pass in gridPosition variable.
+            {
+                if (snakeAteFood) //If TrySnakeEatFood = true
+                { //then Grow Snake.
+                    snakeBodySize++;
+                }
+            }
+
+            if (snakeMovePositionList.Count >= snakeBodySize + 1)//If snakeMovePositionList is larger than or equal to the snakeBodySize + 1.
+            { // then remove the last item from the list.
+                snakeMovePositionList.RemoveAt(snakeMovePositionList.Count - 1);
+            }
+
+            //TESTING############ Snake body by adding white square using code monkey utils
+            for(int i=0; i<snakeMovePositionList.Count; i++)
+            {
+                Vector2Int snakeMovePosition = snakeMovePositionList[i];
+                World_Sprite worldSprite = World_Sprite.Create(new Vector3(snakeMovePosition.x, snakeMovePosition.y, 0), Vector3.one * .5f, Color.white);
+                FunctionTimer.Create(worldSprite.DestroySelf, gridMoveTimerMax);
+            }
 
             transform.position = new Vector3(gridPosition.x, gridPosition.y);
             transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(gridMoveDirection) - 90);
 
-            //Call SnakeMoved Function from LevelGrid.cs and pass in gridPosition variable.
-            levelGrid.SnakeMoved(gridPosition);
+            
         }
     }
 
@@ -100,5 +128,14 @@ public class Snake : MonoBehaviour {
     public Vector2Int GetGridPosition()
     {
         return gridPosition;
+    }
+
+    //A Function that returns the full list of positions occupied by the snake: Head + Body.
+    //called by LevelGrid.cs
+    public List<Vector2Int> GetFullSnakeGridPositionList()
+    {
+        List<Vector2Int> gridPositionList = new List<Vector2Int>() { gridPosition };
+        gridPositionList.AddRange(snakeMovePositionList);
+        return gridPositionList;
     }
 }

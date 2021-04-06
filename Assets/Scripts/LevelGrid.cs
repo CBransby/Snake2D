@@ -53,7 +53,7 @@ public class LevelGrid
         /*Choses a position at random anywhere on the play grid, execpt for the edges or the space which the
          * snake head occupies.*/
         do { foodGridPosition = new Vector2Int(Random.Range(1, width - 1), Random.Range(1, height - 1)); }
-        while (snake.GetGridPosition() == foodGridPosition);
+        while (snake.GetFullSnakeGridPositionList().IndexOf(foodGridPosition) != -1);
         
 
         //create a new food game object, with a food sprite pulled from GameAssets class.
@@ -68,7 +68,7 @@ public class LevelGrid
 
     //Function to be triggered when the snake moves.
     //Called from Snake.cs
-    public void SnakeMoved(Vector2Int snakeGridPosition)
+    public bool TrySnakeEatFood(Vector2Int snakeGridPosition)
     {
         //Check if snake's new position is the same as the food's current position.
         if (snakeGridPosition == foodGridPosition)
@@ -78,7 +78,9 @@ public class LevelGrid
 
             //Spawn a new piece of food at a new location
             SpawnFood();
+            return true;
         }
+        else {return false;}
     }
 
 }

@@ -218,6 +218,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecfc34c1e2cad5940b5fdb55554f1850, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  snakeBodySize: 356
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
