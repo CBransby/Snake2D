@@ -17,6 +17,12 @@ using CodeMonkey;
 using CodeMonkey.Utils;
 
 public class GameHandler : MonoBehaviour {
+    //variable for custom map sizing. --# means that belongs to this set of variables 
+    public int h;
+    public int w;
+    private GameObject gridBackground;
+    public Camera mainCamera;
+
 
     //Variable for storing a reference to Snake
     private static GameHandler instance;
@@ -28,16 +34,23 @@ public class GameHandler : MonoBehaviour {
     //Variable for storing a reference to LevelGrid
     private LevelGrid levelGrid;
 
+    private static bool gameIsPaused = false;
+
     private void Awake()
     {
+        mainCamera = Camera.main;
         instance = this;
+        LevelGrid.GetGridSize(w, h); //--#
+        gridBackground = GameObject.FindGameObjectWithTag("Background");//--#
+        SetupPlayArea();//--#
         InitializeStatic();
+
     }
 
     private void Start() {
 
         //assign a new 20 x 20 grid to levelGrid.
-        levelGrid = new LevelGrid(20, 20);
+        levelGrid = new LevelGrid(w, h);
 
         //Call Set up function on Snake.cs and pass it the reference too LevelGrid.cs
         snake.Setup(levelGrid);
@@ -50,7 +63,7 @@ public class GameHandler : MonoBehaviour {
     {
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            if(IsGamePaused() == true)
+            if(gameIsPaused != false)
             {
                 ResumeGame();
             }
@@ -58,8 +71,15 @@ public class GameHandler : MonoBehaviour {
             {
                 PauseGame();
             }
-            
         }
+    }
+
+    public void SetupPlayArea()//--#
+    {
+        gridBackground.GetComponent<RectTransform>().localScale = new Vector3(w, h);
+        gridBackground.GetComponent<RectTransform>().position = new Vector3(w / 2, h / 2);
+        mainCamera.transform.position = new Vector3(w / 2, h / 2, -10);
+        mainCamera.orthographicSize = h / 2 + 2;
     }
 
     public static int GetScore()
@@ -77,21 +97,17 @@ public class GameHandler : MonoBehaviour {
         score = 0;
     }
 
-    public static void ResumeGame()
-    {
-        PauseWindow.HideStatic();
-        Time.timeScale = 1.0f;
-    }
-
     public static void PauseGame()
     {
+        Time.timeScale = 0;
         PauseWindow.ShowStatic();
-        Time.timeScale = 0.0f;
+        gameIsPaused = true;
     }
-    
-    public bool IsGamePaused()
+    public static void ResumeGame()
     {
-        return Time.timeScale == 0f;
+        Time.timeScale = 1;
+        PauseWindow.HideStatic();
+        gameIsPaused = false;
     }
 
 

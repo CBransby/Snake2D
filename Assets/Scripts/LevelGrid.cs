@@ -16,19 +16,19 @@ public class LevelGrid
     private Snake snake;
 
     //Width of the play grid
-    private int width;
+    private static int width;
 
     //Height of the play grid
-    private int height;
+    private static int height;
 
 
 
     //Function to set the dimentions of the play area
     //called by GameHandler
-    public LevelGrid(int width, int height)
+    public LevelGrid(int w, int h)
     {
-        this.width = width;
-        this.height = height;
+        width = w;
+        height = h;
     }
 
 
@@ -44,6 +44,11 @@ public class LevelGrid
         SpawnFood();
     }
 
+    public static void GetGridSize(int w, int h)
+    {
+        width = w;
+        height = h;
+    }
 
 
     //Function for spawning food object.
