@@ -46,6 +46,22 @@ public class GameHandler : MonoBehaviour {
         levelGrid.Setup(snake);
     }
 
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            if(IsGamePaused() == true)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+            
+        }
+    }
+
     public static int GetScore()
     {
         return score;
@@ -59,6 +75,23 @@ public class GameHandler : MonoBehaviour {
     public void InitializeStatic()
     {
         score = 0;
+    }
+
+    public static void ResumeGame()
+    {
+        PauseWindow.HideStatic();
+        Time.timeScale = 1.0f;
+    }
+
+    public static void PauseGame()
+    {
+        PauseWindow.ShowStatic();
+        Time.timeScale = 0.0f;
+    }
+    
+    public bool IsGamePaused()
+    {
+        return Time.timeScale == 0f;
     }
 
 
