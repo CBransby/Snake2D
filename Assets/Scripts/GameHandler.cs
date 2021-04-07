@@ -31,6 +31,7 @@ public class GameHandler : MonoBehaviour {
     private void Awake()
     {
         instance = this;
+        InitializeStatic();
     }
 
     private void Start() {
@@ -43,6 +44,7 @@ public class GameHandler : MonoBehaviour {
 
         //Call Set up function on LevelGrid.cs and pass it the reference too Snake.cs
         levelGrid.Setup(snake);
+        CMDebug.ButtonUI(Vector2.zero, "Reload Scene", () => { Loader.Load(Loader.Scene.GameScene); }); 
     }
 
     public static int GetScore()
@@ -53,6 +55,11 @@ public class GameHandler : MonoBehaviour {
     public static void AddScore()
     {
         score += 100;
+    }
+
+    public void InitializeStatic()
+    {
+        score = 0;
     }
 
 
