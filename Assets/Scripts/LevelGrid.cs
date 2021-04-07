@@ -75,7 +75,7 @@ public class LevelGrid
         {
             //If it is, destroy current food object.
             GameObject.Destroy(foodGameObject);
-
+            GameHandler.AddScore();
             //Spawn a new piece of food at a new location
             SpawnFood();
             return true;

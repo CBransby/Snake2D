@@ -19,11 +19,19 @@ using CodeMonkey.Utils;
 public class GameHandler : MonoBehaviour {
 
     //Variable for storing a reference to Snake
+    private static GameHandler instance;
+
+    public static int score;
+
     [SerializeField] private Snake snake;
 
     //Variable for storing a reference to LevelGrid
     private LevelGrid levelGrid;
 
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private void Start() {
 
@@ -35,6 +43,16 @@ public class GameHandler : MonoBehaviour {
 
         //Call Set up function on LevelGrid.cs and pass it the reference too Snake.cs
         levelGrid.Setup(snake);
+    }
+
+    public static int GetScore()
+    {
+        return score;
+    }
+
+    public static void AddScore()
+    {
+        score += 100;
     }
 
 
