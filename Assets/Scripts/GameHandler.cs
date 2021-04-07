@@ -44,7 +44,6 @@ public class GameHandler : MonoBehaviour {
 
         //Call Set up function on LevelGrid.cs and pass it the reference too Snake.cs
         levelGrid.Setup(snake);
-        CMDebug.ButtonUI(Vector2.zero, "Reload Scene", () => { Loader.Load(Loader.Scene.GameScene); }); 
     }
 
     public static int GetScore()

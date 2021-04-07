@@ -40,13 +40,6 @@ public class LevelGrid
         //Assigns the Snake.cs passed into the function to the variable on this script.
         this.snake = snake;
 
-        //TESTING LOAD LAG
-        for(int i=0; i<50000; i++)
-        {
-            foodGameObject = new GameObject("Food", typeof(SpriteRenderer));
-            foodGameObject.GetComponent<SpriteRenderer>().sprite = GameAssets.i.foodSprite;
-        }
-
         //Spawns the first piece of food.
         SpawnFood();
     }

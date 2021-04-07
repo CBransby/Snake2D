@@ -33,6 +33,7 @@ public class Snake : MonoBehaviour {
         Left,
         Right
     }
+    private GameObject gameOverWindow;
     private State state;
     private Direction gridMoveDirection;
     private Vector2Int gridPosition;
@@ -58,6 +59,8 @@ public class Snake : MonoBehaviour {
         gridMoveTimer = gridMoveTimerMax;
         gridMoveDirection = Direction.Right;
         state = State.Alive;
+        gameOverWindow = GameObject.Find("GameOverWindow");
+        gameOverWindow.SetActive(false);
 
         snakeMovePositionList = new List<SnakeMovePosition>();//Initialise new list
         snakeBodyPartList = new List<SnakeBodyPart>();//Initialise new list
@@ -148,7 +151,7 @@ public class Snake : MonoBehaviour {
                 Vector2Int snakeBodyPartGridPosition = snakeBodyPart.GetGridPosition();
                 if(gridPosition == snakeBodyPartGridPosition)
                 {
-                    CMDebug.TextPopup("DEAD", transform.position);
+                    gameOverWindow.SetActive(true);
                     state = State.Dead;
                 }
             }
