@@ -19,6 +19,12 @@ using System;
 
 public class Snake : MonoBehaviour {
 
+
+    private enum State
+    {
+        Alive,
+        Dead
+    }
     //Enum to store movement Direction
     private enum Direction
     {
@@ -27,6 +33,7 @@ public class Snake : MonoBehaviour {
         Left,
         Right
     }
+    private State state;
     private Direction gridMoveDirection;
     private Vector2Int gridPosition;
     private float gridMoveTimer;
@@ -49,15 +56,24 @@ public class Snake : MonoBehaviour {
         gridPosition = new Vector2Int(10, 10);
         gridMoveTimerMax = .25f;
         gridMoveTimer = gridMoveTimerMax;
-        gridMoveDirection = Direction.Right; 
+        gridMoveDirection = Direction.Right;
+        state = State.Alive;
 
         snakeMovePositionList = new List<SnakeMovePosition>();//Initialise new list
         snakeBodyPartList = new List<SnakeBodyPart>();//Initialise new list
     }
 
     private void Update() {
-        HandleInput();
-        HandleGridMovement();
+        switch(state)
+        {
+            case State.Alive:
+                HandleInput();
+                HandleGridMovement();
+                break;
+            case State.Dead:
+                break;
+        }
+        
     }
 
     private void HandleInput() {
@@ -109,6 +125,7 @@ public class Snake : MonoBehaviour {
                 case Direction.Down: gridMoveDirectionVector = new Vector2Int(0, -1); break;
             }
             gridPosition += gridMoveDirectionVector; //Set Snake's new position.
+            gridPosition = levelGrid.ValidateGridPosition(gridPosition);
 
             bool snakeAteFood = levelGrid.TrySnakeEatFood(gridPosition); //Call TrySnakeEatFood Function from LevelGrid.cs and pass in gridPosition variable.
             {
@@ -124,7 +141,17 @@ public class Snake : MonoBehaviour {
                 snakeMovePositionList.RemoveAt(snakeMovePositionList.Count - 1);
             }
 
+            UpdateSnakeBodyParts();
 
+            foreach (SnakeBodyPart snakeBodyPart in snakeBodyPartList)
+            {
+                Vector2Int snakeBodyPartGridPosition = snakeBodyPart.GetGridPosition();
+                if(gridPosition == snakeBodyPartGridPosition)
+                {
+                    CMDebug.TextPopup("DEAD", transform.position);
+                    state = State.Dead;
+                }
+            }
 
             /*/TESTING############ Snake body by adding white square using code monkey utils
             for(int i=0; i<snakeMovePositionList.Count; i++)
@@ -138,7 +165,7 @@ public class Snake : MonoBehaviour {
             transform.position = new Vector3(gridPosition.x, gridPosition.y);
             transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(gridMoveDirectionVector) - 90);
 
-            UpdateSnakeBodyParts();
+            
             
 
             
@@ -281,6 +308,11 @@ public class Snake : MonoBehaviour {
 
             }
             transform.eulerAngles = new Vector3(0, 0, angle);
+        }
+
+        public Vector2Int GetGridPosition()
+        {
+            return snakeMovePosition.GetGridPosition();
         }
     }
 
