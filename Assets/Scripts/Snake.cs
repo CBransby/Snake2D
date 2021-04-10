@@ -39,7 +39,7 @@ public class Snake : MonoBehaviour {
     private Vector2Int gridPosition;
     private float gridMoveTimer;
     private float gridMoveTimerMax;
-
+    private WallGrid wallGrid;
     
     public LevelGrid levelGrid; //Variable for storing a Reference to the LevelGrid script.
     [SerializeField] private int snakeBodySize; //Variable for storing the current size of the snake
@@ -48,10 +48,11 @@ public class Snake : MonoBehaviour {
 
     //Function to Setup a Reference to LevelGrid.cs on Spawn.
     //Called from GameHandler
-    public void Setup(LevelGrid levelGrid)
+    public void Setup(LevelGrid levelGrid, WallGrid wallGrid)
     {
         //Assigns the level grid passed into the function to the variable on this script.
         this.levelGrid = levelGrid;
+        this.wallGrid = wallGrid;
     }
     private void Awake() {
         gridPosition = new Vector2Int(10, 10);
@@ -129,6 +130,15 @@ public class Snake : MonoBehaviour {
             }
             gridPosition += gridMoveDirectionVector; //Set Snake's new position.
             gridPosition = levelGrid.ValidateGridPosition(gridPosition);
+
+            bool snakeHitWall = wallGrid.CheckSnakeHitWall(gridPosition);
+            {
+                if(snakeHitWall)
+                {
+                    gameOverWindow.SetActive(true);
+                    state = State.Dead;
+                }
+            }
 
             bool snakeAteFood = levelGrid.TrySnakeEatFood(gridPosition); //Call TrySnakeEatFood Function from LevelGrid.cs and pass in gridPosition variable.
             {

@@ -15,11 +15,15 @@ public class LevelGrid
     //Variable to store a reference to Snake.cs
     private Snake snake;
 
+    private WallGrid wallGrid;
+
     //Width of the play grid
     private static int width;
 
     //Height of the play grid
     private static int height;
+
+    private Vector3 tempFoodPosition;
 
 
 
@@ -35,10 +39,11 @@ public class LevelGrid
 
     //Function to Setup a Reference to Snake.cs on Spawn and Call SpawnFood Function to spawn the first food.
     //Called From GameHandler
-    public void Setup(Snake snake)
+    public void Setup(Snake snake, WallGrid wallGrid)
     {
         //Assigns the Snake.cs passed into the function to the variable on this script.
         this.snake = snake;
+        this.wallGrid = wallGrid;
 
         //Spawns the first piece of food.
         SpawnFood();
@@ -58,8 +63,9 @@ public class LevelGrid
         /*Choses a position at random anywhere on the play grid, execpt for the edges or the space which the
          * snake head occupies.*/
         do { foodGridPosition = new Vector2Int(Random.Range(1, width - 1), Random.Range(1, height - 1)); }
-        while (snake.GetFullSnakeGridPositionList().IndexOf(foodGridPosition) != -1);
-        
+        while (snake.GetFullSnakeGridPositionList().IndexOf(foodGridPosition) != -1 || wallGrid.CheckSnakeHitWall(foodGridPosition));
+
+
 
         //create a new food game object, with a food sprite pulled from GameAssets class.
         foodGameObject = new GameObject("Food", typeof(SpriteRenderer));
@@ -67,9 +73,8 @@ public class LevelGrid
 
         //Sets new GameObject "Food" to the random position selected.
         foodGameObject.transform.position = new Vector3(foodGridPosition.x, foodGridPosition.y, 0);
+
     }
-
-
 
     //Function to be triggered when the snake moves.
     //Called from Snake.cs

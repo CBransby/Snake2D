@@ -31,6 +31,8 @@ public class GameHandler : MonoBehaviour {
 
     [SerializeField] private Snake snake;
 
+    private WallGrid wallGrid;
+
     //Variable for storing a reference to LevelGrid
     private LevelGrid levelGrid;
 
@@ -38,25 +40,33 @@ public class GameHandler : MonoBehaviour {
 
     private void Awake()
     {
+        wallGrid = new WallGrid();
         mainCamera = Camera.main;
         instance = this;
         LevelGrid.GetGridSize(w, h); //--#
         gridBackground = GameObject.FindGameObjectWithTag("Background");//--#
         SetupPlayArea();//--#
         InitializeStatic();
+        wallGrid.SpawnWalls();
 
     }
 
     private void Start() {
 
+        
         //assign a new 20 x 20 grid to levelGrid.
         levelGrid = new LevelGrid(w, h);
 
         //Call Set up function on Snake.cs and pass it the reference too LevelGrid.cs
-        snake.Setup(levelGrid);
+        snake.Setup(levelGrid, wallGrid);
 
         //Call Set up function on LevelGrid.cs and pass it the reference too Snake.cs
-        levelGrid.Setup(snake);
+        levelGrid.Setup(snake, wallGrid);
+
+        wallGrid.Setup(snake, levelGrid);
+
+
+        
     }
 
     private void Update()
